@@ -2,6 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <utility>
+#include <time.h>
 
 int read_amount() {
 	std::string input;
@@ -43,7 +46,7 @@ int read_amount() {
 	return res;
 }
 
-void game() {
+std::pair<int, int> game() {
 	int num = read_amount();
 	std::vector<int> arr;
 	for (auto i = 0; i < num; ++i) {
@@ -114,11 +117,61 @@ void game() {
 		guess.clear();
 	}
 	std::cout << "Congratulation, you won! It took you " << guess_cnt << " guesses!" << std::endl;
+	return std::pair<int, int>(num, guess_cnt);
+}
+
+void get_answer(bool &b) {
+	std::cout << "Do you want to play again? (Y/N)" << std::endl;
+	std::string input;
+	for (auto answer = 'N';;) {
+		std::cin >> input;
+		if (input.length() == 1) {
+			answer = input.at(0);
+		}
+		else {
+			std::cout << "Error: input string is too large. Valid inputs are Y and N. Try again: " << std::endl;
+			continue;
+		}
+		if (toupper(answer) == 'Y') {
+			b = true;
+			return;
+		}
+		else if (toupper(answer) == 'N') {
+			b = false;
+			return;
+		}
+		else {
+			std::cout << "Error: invalid input. Valid inputs are Y and N. Try again: " << std::endl;
+			continue;
+		}
+	}
+}
+
+void save_result(std::pair<int, int> game_result) {
+	std::ofstream fout("game_results.txt", std::ios_base::app);
+	char time_output[40];
+	tm current_time;
+	const time_t timer = time(NULL);
+	localtime_s(&current_time, &timer);
+	strftime(time_output, 40, "%d.%m.%Y %H:%M:%S : ", &current_time);
+	if (fout.is_open())
+	{
+		fout << time_output << "game was completed in " << game_result.second <<
+			" guesses for " << game_result.first << " digits." << std::endl;
+		fout.close();
+	}
+	else {
+		std::cout << "Warning: the result of this game will not be saved as the file for storing results could not be opened/created" << std::endl;
+	}
 }
 
 int main() {
 	srand(static_cast<int>(time(NULL)));
-	game();
-	system("PAUSE");
+	std::pair<int, int> game_result;
+	for (auto answer = true; answer;) {
+		game_result = game();
+		save_result(game_result);
+		get_answer(answer);
+	}
 	return 0;
 }
