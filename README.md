@@ -7,6 +7,7 @@ Each turn player tries to guess the secret number.
 The guess is then evaluated by giving an amount of matching digits following next rule:
  - If digit in a guessed number is in the same position as in the secret number, it is considered a "bull";
  - If it is in different position, it is considered a "cow".
+
 The amounts of "bulls" and "cows" are presented to the player afterwards.
 If amount of "bulls" equals N, meaning that the secret number has been guessed correctly, the game is won.
 If not, the player makes another guess.
